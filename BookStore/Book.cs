@@ -26,14 +26,19 @@ namespace BookStore
 
         public void AddCopies(int quantity)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(quantity);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
             Quantity += quantity;
         }
         
         public void RemoveCopies(int quantity)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(quantity);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
             Quantity -= quantity;
+
+            if (Quantity < 0)
+            {
+                Quantity = 0;
+            }
         }
     }
 }

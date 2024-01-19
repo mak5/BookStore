@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace BookStore
-{
+{ 
     public class Cart
     {
         public List<CartItem> Items { get; private set; }
@@ -64,8 +64,18 @@ namespace BookStore
             }
         }
 
-        public void Checkout()
+        public void Checkout(ISupplierService supplierService)
         {
+            foreach (var item in Items)
+            {
+                item.Book.RemoveCopies(item.Quantity);
+
+                if (item.Quantity > item.Book.Quantity)
+                {
+                    supplierService.OrderCopies(item.Book.Title, item.Quantity - item.Book.Quantity);
+                }
+            }
+
             Completed = true;
         }
 
@@ -95,13 +105,13 @@ namespace BookStore
 
         public void IncreaseQuantity(int quantity)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(quantity);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
             Quantity += quantity;
         }
 
         public void DecreaseQuantity(int quantity)
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(quantity);
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(quantity);
             Quantity -= quantity;
         }
 

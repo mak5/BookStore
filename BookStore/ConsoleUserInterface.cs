@@ -104,7 +104,7 @@ namespace BookStore
 
         public static void Checkout()
         {
-            cart.Checkout();
+            cart.Checkout(new SupplierService());
             Console.WriteLine($"Total amount to pay: ${Math.Round(cart.TotalPrice, 2)}");
             Console.WriteLine("Thank you for shopping with us!");
         }
