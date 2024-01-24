@@ -1,4 +1,13 @@
 ﻿using BookStore;
+using Microsoft.Extensions.DependencyInjection;
+
+var serviceProvider = new ServiceCollection()
+    .AddScoped<ISupplierService, SupplierService>()
+    .AddScoped<IDeliveryDateCalculator, DeliveryDateCalculator>()
+    .BuildServiceProvider();
+
+var supplierService = serviceProvider.GetService<ISupplierService>();
+var Ui = new ConsoleUserInterface(supplierService);
 
 while (true)
 {
@@ -13,29 +22,28 @@ while (true)
 
     Console.Write("Enter your choice: ");
     string choice = Console.ReadLine();
-
     switch (choice)
     {
         case "1":
-            ConsoleUserInterface.CreateBook();
+            Ui.CreateBook();
             break;
         case "2":
-            ConsoleUserInterface.ListBooks();
+            Ui.ListBooks();
             break;
         case "3":
-            ConsoleUserInterface.AddToCart();
+            Ui.AddToCart();
             break;
         case "4":
-            ConsoleUserInterface.ViewCart();
+            Ui.ViewCart();
             break;
         case "5":
-            ConsoleUserInterface.Checkout();
+            Ui.Checkout();
             break;
         case "6":
-            ConsoleUserInterface.IncreaseStock();
+            Ui.IncreaseStock();
             break;
         case "7":
-            ConsoleUserInterface.Exit();
+            Ui.Exit();
             break;
         default:
             Console.WriteLine("Invalid choice. Please try again.");

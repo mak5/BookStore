@@ -64,19 +64,27 @@ namespace BookStore
             }
         }
 
-        public void Checkout(ISupplierService supplierService)
+        public DateOnly Checkout(ISupplierService supplierService)
         {
+            DateOnly deliveryDate = DateOnly.FromDateTime(DateTime.Now);
             foreach (var item in Items)
             {
-                item.Book.RemoveCopies(item.Quantity);
 
                 if (item.Quantity > item.Book.Quantity)
                 {
-                    supplierService.OrderCopies(item.Book.Title, item.Quantity - item.Book.Quantity);
+                    var expectedOrderDate = supplierService.OrderCopies(item.Book.Title, item.Quantity - item.Book.Quantity);
+                    if ( expectedOrderDate > deliveryDate)
+                    {
+                        deliveryDate = expectedOrderDate;
+                    }
                 }
+
+                item.Book.RemoveCopies(item.Quantity);
             }
 
             Completed = true;
+
+            return deliveryDate;
         }
 
         public double TotalPrice => Items.Sum(item => item.Subtotal);

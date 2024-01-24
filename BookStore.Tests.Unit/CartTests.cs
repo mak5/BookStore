@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using FluentAssertions;
+using Moq;
 
 namespace BookStore.Tests.Unit
 {
@@ -216,20 +217,69 @@ namespace BookStore.Tests.Unit
         {
             // Arrange
             var cart = new Cart();
-            var book = new Book("The Lord Of The Rings", 19.99)
-            {
-                Id = 1
-            };
-            book.AddCopies(10);
-            var quantity = 10;
+            var book = new Book("The Lord Of The Rings", 19.99);
+            book.AddCopies(1);
+            var quantity = 2;
             cart.AddItem(book, quantity);
 
             // Act
             cart.Checkout(_supplierServiceMock.Object);
 
             // Assert
-            _supplierServiceMock.Verify(s => s.OrderCopies(book.Title, quantity - book.Quantity), Times.Once);
+            _supplierServiceMock.Verify(s => s.OrderCopies(book.Title, It.IsAny<int>()), Times.Once);
         }
 
+        [Theory]
+        [InlineData(9)]
+        [InlineData(10)]
+        public void Checkout_Should_NotCallOrderCopies_When_QuantityIsLessThanOrEqualBookQuantity(int quantity)
+        {
+            // Arrange
+            var cart = new Cart();
+            var book = new Book("The Lord Of The Rings", 19.99);
+            book.AddCopies(10);
+            cart.AddItem(book, quantity);
+
+            // Act
+            cart.Checkout(_supplierServiceMock.Object);
+
+            // Assert
+            _supplierServiceMock.Verify(s => s.OrderCopies(It.IsAny<string>(), It.IsAny<int>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(9)]
+        [InlineData(10)]
+        public void Checkout_Should_ReturnDeliveryDate_As_Today_When_QuantityIsLessThanOrEqualBookQuantity(int quantity)
+        {
+            // Arrange
+            var cart = new Cart();
+            var book = new Book("The Lord Of The Rings", 19.99);
+            book.AddCopies(10);
+            cart.AddItem(book, quantity);
+
+            // Act
+            var deliveryDate = cart.Checkout(_supplierServiceMock.Object);
+
+            // Assert
+            Assert.Equal(DateOnly.FromDateTime(DateTime.Now), deliveryDate);
+        }
+
+        [Fact]
+        public void Checkout_Should_ReturnDeliveryDate_GreaterThan_Today_When_QuantityIsGreaterThanBookQuantity()
+        {
+            // Arrange
+            var cart = new Cart();
+            var book = new Book("The Lord Of The Rings", 19.99);
+            book.AddCopies(5);
+            var quantity = 10;
+            cart.AddItem(book, quantity);
+
+            // Act
+            var deliveryDate = cart.Checkout(_supplierServiceMock.Object);
+
+            // Assert
+            deliveryDate.Should().BeAfter(DateOnly.FromDateTime(DateTime.Now));
+        }
     }
 }

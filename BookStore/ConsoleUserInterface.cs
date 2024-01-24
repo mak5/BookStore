@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 
 namespace BookStore
 {
-    public static class ConsoleUserInterface
+    public class ConsoleUserInterface
     {
-        private static Cart cart = new();
+        private readonly ISupplierService _supplierService;
 
-        public static void CreateBook()
+        private readonly Cart cart = new();
+
+        public ConsoleUserInterface(ISupplierService supplierService)
+        {
+            _supplierService = supplierService;
+        }
+
+        public  void CreateBook()
         {
             Console.Write("Enter the title of the book: ");
             string title = Console.ReadLine();
@@ -28,7 +35,7 @@ namespace BookStore
             Console.WriteLine("Book created successfully!");
         }
 
-        public static void ListBooks()
+        public void ListBooks()
         {
             var books = BookStoreDb.GetBooks();
             if (books.Count == 0)
@@ -42,7 +49,7 @@ namespace BookStore
             }
         }
 
-        public static void AddToCart()
+        public void AddToCart()
         {
             ListBooks();
             Console.Write("Enter the id of the book to add to the cart: ");
@@ -74,7 +81,7 @@ namespace BookStore
             }
         }
 
-        public static void ViewCart()
+        public void ViewCart()
         {
             if (cart.Items.Count == 0)
             {
@@ -87,7 +94,7 @@ namespace BookStore
             }
         }
 
-        private static void DisplayCart()
+        private void DisplayCart()
         {
             Console.WriteLine("Cart Items:");
             Console.WriteLine("------------------------------------------------");
@@ -102,14 +109,16 @@ namespace BookStore
             Console.WriteLine("------------------------------------------------");
         }
 
-        public static void Checkout()
+        public void Checkout()
         {
-            cart.Checkout(new SupplierService());
+
+            var deliveryDate = cart.Checkout(_supplierService);
             Console.WriteLine($"Total amount to pay: ${Math.Round(cart.TotalPrice, 2)}");
+            Console.WriteLine($"Your delivery is estimated to be on {deliveryDate}");
             Console.WriteLine("Thank you for shopping with us!");
         }
 
-        public static void IncreaseStock()
+        public void IncreaseStock()
         {
             Console.Write("Enter the id of the book: ");
             int bookId;
@@ -140,7 +149,12 @@ namespace BookStore
             Console.WriteLine("Book quantity updated successfully!");
         }
 
-        private static void DisplayBookTable(List<Book> books)
+        public void Exit()
+        {
+            Environment.Exit(0);
+        }
+
+        private void DisplayBookTable(List<Book> books)
         {
             // Define headers
             string[] headers = { "Id", "Title", "Price", "Quantity" };
@@ -172,9 +186,6 @@ namespace BookStore
             Console.WriteLine(new string('-', 15 * headers.Length + headers.Length + 1));
         }
 
-        internal static void Exit()
-        {
-            Environment.Exit(0);
-        }
+        
     }
 }
