@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BookStore
 {
-    public class SupplierService(IDeliveryDateCalculator deliveryDateCalculator) : ISupplierService
+    public class SupplierService(IDeliveryDateCalculator deliveryDateCalculator, IDateTimeProvider dateTimeProvider) : ISupplierService
     {
         public DateOnly OrderCopies(string title, int copiesCount)
         {
@@ -16,6 +16,11 @@ namespace BookStore
             int businessDaysToAdd = deliveryDateCalculator.CalculateBusinessDaysToAdd(copiesCount);
 
             var deliveryDate = deliveryDateCalculator.Calculate(businessDaysToAdd);
+
+            if (deliveryDate < DateOnly.FromDateTime(dateTimeProvider.Now))
+            {
+                throw new InvalidDeliveryDateException();
+            }
 
             return deliveryDate;
         }

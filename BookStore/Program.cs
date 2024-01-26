@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 var serviceProvider = new ServiceCollection()
     .AddScoped<ISupplierService, SupplierService>()
     .AddScoped<IDeliveryDateCalculator, DeliveryDateCalculator>()
+    .AddScoped<IDateTimeProvider, DateTimeProvider>()
     .BuildServiceProvider();
 
 var supplierService = serviceProvider.GetService<ISupplierService>();
