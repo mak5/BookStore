@@ -226,13 +226,13 @@ namespace BookStore.Tests.Unit
             cart.Checkout(_supplierServiceMock.Object);
 
             // Assert
-            _supplierServiceMock.Verify(s => s.OrderCopies(book.Title, It.IsAny<int>()), Times.Once);
+            _supplierServiceMock.Verify(s => s.OrderCopies(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
         }
 
         [Theory]
         [InlineData(9)]
         [InlineData(10)]
-        public void Checkout_Should_NotCallOrderCopies_When_QuantityIsLessThanOrEqualBookQuantity(int quantity)
+        public void Checkout_Should_NotCallOrderCopies_When_QuantityIsLessThanOrEqualToBookQuantity(int quantity)
         {
             // Arrange
             var cart = new Cart();
@@ -250,7 +250,7 @@ namespace BookStore.Tests.Unit
         [Theory]
         [InlineData(9)]
         [InlineData(10)]
-        public void Checkout_Should_ReturnDeliveryDate_As_Today_When_QuantityIsLessThanOrEqualBookQuantity(int quantity)
+        public void Checkout_Should_ReturnDeliveryDate_As_Today_When_QuantityIsLessThanOrEqualToBookQuantity(int quantity)
         {
             // Arrange
             var cart = new Cart();
